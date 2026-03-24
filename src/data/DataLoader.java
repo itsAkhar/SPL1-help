@@ -183,7 +183,7 @@ public class DataLoader {
                     double depressionValue = Double.parseDouble(values[37].replace("\"", "").trim());
 
                     double[] features = new double[] {
-                            age, gender, academicYear, cgpa, scholarship, anxietyValue, depressionValue
+                            age, gender, cgpa, anxietyValue, depressionValue
                     };
 
                     int stressLabel = encodeStressLabel(values[18]);
