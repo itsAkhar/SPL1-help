@@ -7,12 +7,12 @@
 
 ---
 
-## 🎯 Project Abstract
+##  Project Abstract
 This project implements a complete machine learning framework from scratch in **pure Java** to predict the stress levels of university students. Moving beyond simple classification, the system is designed with a **medical-centric goal**: to maximize the detection (Recall) of minority stress categories (Low and High) where intervention is most critical. The project demonstrates the full lifecycle of a data science project, from raw data ingestion to rigorous **250-iteration stability testing** and mathematical feature justification.
 
 ---
 
-## 🛠 Technical Architecture (From Scratch)
+##  Technical Architecture (From Scratch)
 The core constraint of this project was the **prohibition of external ML libraries**. Every component was implemented manually using standard Java features.
 
 ### 1. Data Pipeline (`data` package)
@@ -32,7 +32,7 @@ The core constraint of this project was the **prohibition of external ML librari
 
 ---
 
-## 🧪 Scientific Methodology & Findings
+##  Scientific Methodology & Findings
 
 ### Data-Driven Feature Selection
 The feature set was optimized to the "Final 5" based on **Pearson Correlation Analysis** and **Categorical Distribution Analysis**:
@@ -53,7 +53,7 @@ The system was evaluated over **250 randomized runs** to find stable averages. W
 
 ---
 
-## 📈 Results Summary (Averaged Over 250 Runs)
+##  Results Summary (Averaged Over 250 Runs)
 | Scenario | Overall Accuracy | LOW Stress Recall | HIGH Stress Recall |
 | :--- | :--- | :--- | :--- |
 | **Raw / Imbalanced** | ~72% | ~5% | ~50% |
@@ -63,7 +63,7 @@ The system was evaluated over **250 randomized runs** to find stable averages. W
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 ```text
 src/
 ├── Main.java                 # Orchestrates the 250-run experiment
