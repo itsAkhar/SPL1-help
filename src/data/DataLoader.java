@@ -205,7 +205,7 @@ public class DataLoader {
 
 //    public static void main(String[] args) {
 //        // the csv file
-//        String filePath = "Processed.csv";
+//        String filePath = "MentalHealth.csv";
 //
 //        DataLoader loader = new DataLoader();
 //        List<DataPoint> data = loader.loadData(filePath);

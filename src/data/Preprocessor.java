@@ -185,4 +185,40 @@ public class Preprocessor {
         if (denominator == 0) return 0.0;
         return numerator / denominator;
     }
+
+    /**
+     * Creates training and testing sets for a specific fold in K-Fold Cross-Validation.
+     *
+     * @param allData The entire shuffled dataset.
+     * @param numFolds The total number of folds (K).
+     * @param foldIndex The index of the fold to be used as the test set for this iteration (0 to K-1).
+     * @return A List containing two lists: the training set at index 0, and the testing set at index 1.
+     */
+    public static List<List<DataPoint>> getKFoldSplit(List<DataPoint> allData, int numFolds, int foldIndex) {
+        int totalSize = allData.size();
+        int foldSize = totalSize / numFolds;
+
+        // --- Step 1: Identify the start and end indices of the test fold ---
+        int testStartIndex = foldIndex * foldSize;
+        // The end index should not go past the end of the list.
+        int testEndIndex = Math.min(testStartIndex + foldSize, totalSize);
+
+        // --- Step 2: Create the testing set ---
+        // It's the sublist for the current fold.
+        List<DataPoint> testingSet = new ArrayList<>(allData.subList(testStartIndex, testEndIndex));
+
+        // --- Step 3: Create the training set ---
+        // It's everything EXCEPT the testing set.
+        List<DataPoint> trainingSet = new ArrayList<>();
+        // Add all data *before* the test set.
+        trainingSet.addAll(allData.subList(0, testStartIndex));
+        // Add all data *after* the test set.
+        trainingSet.addAll(allData.subList(testEndIndex, totalSize));
+
+        // --- Step 4: Return both sets in a container list ---
+        List<List<DataPoint>> result = new ArrayList<>();
+        result.add(trainingSet);
+        result.add(testingSet);
+        return result;
+    }
 }
