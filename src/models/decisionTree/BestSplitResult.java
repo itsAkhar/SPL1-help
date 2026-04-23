@@ -3,24 +3,22 @@ package models.decisionTree;
 import data.DataPoint;
 import java.util.List;
 
-/**
- * A simple data-holding class (a "struct" or "record") used to return multiple values
- * from the findBestSplit method. This is cleaner than returning a generic array or map.
- */
+// a class to hold all the components of best possible split
 public class BestSplitResult {
 
-    // The question that resulted in the best split (e.g., "Is CGPA <= 3.0?").
+    // the question with 2 components -> feature and value
     private final SplitCondition condition;
 
-    // The Information Gain score achieved by this split. Storing this is useful for debugging.
+    // the info gain value
     private final double gain;
 
-    // The subset of data that matched the condition (the "yes" group).
+    // the subset of data that matched the condition (the "yes" group).
     private final List<DataPoint> leftData;
 
-    // The subset of data that did not match the condition (the "no" group).
+    // the subset of data that did not match the condition (the "no" group).
     private final List<DataPoint> rightData;
 
+    // the constructor
     public BestSplitResult(SplitCondition condition, double gain, List<DataPoint> leftData, List<DataPoint> rightData) {
         this.condition = condition;
         this.gain = gain;
@@ -28,7 +26,7 @@ public class BestSplitResult {
         this.rightData = rightData;
     }
 
-    // --- Standard "Getter" methods to access the stored data ---
+    // getter methods
     public SplitCondition getCondition() { return condition; }
     public double getGain() { return gain; }
     public List<DataPoint> getLeftData() { return leftData; }

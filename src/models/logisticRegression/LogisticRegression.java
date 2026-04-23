@@ -4,7 +4,7 @@ import data.DataPoint;
 import java.util.List;
 import java.util.Random;
 
-/**
+/*
  * A from-scratch implementation of Multi-class Logistic Regression (Softmax Regression).
  */
 public class LogisticRegression {
@@ -14,6 +14,7 @@ public class LogisticRegression {
     private final double learningRate;
     private final int epochs;
 
+    // the constructor
     public LogisticRegression(int numFeatures, int numClasses, double learningRate, int epochs) {
         this.learningRate = learningRate;
         this.epochs = epochs;
@@ -23,16 +24,13 @@ public class LogisticRegression {
         Random rand = new Random();
         for (int i = 0; i < numFeatures; i++) {
             for (int j = 0; j < numClasses; j++) {
-                this.weights[i][j] = (rand.nextDouble() - 0.5) / 50.0;
+                this.weights[i][j] = (rand.nextDouble() - 0.5) / 50.0; // (rand.nextDouble() - 0.5) scales to -.5 to +.5 and dividing to 50 gets a more small value
             }
         }
     }
 
-    /**
-     * The main training method using Stochastic Gradient Descent.
-     * @param trainingData The list of DataPoints to learn from.
-     */
-    public void train(List<DataPoint> trainingData) { // <-- FIX 1: Return type is void
+    // the main training method of Stochastic Gradient Descent
+    public void train(List<DataPoint> trainingData) {
         int numFeatures = weights.length;
         int numClasses = biases.length;
 
@@ -40,11 +38,12 @@ public class LogisticRegression {
             for (DataPoint dp : trainingData) {
                 double[] features = dp.getFeatures();
 
-                // Step 1: Forward Pass
+                // step 1: forward Pass
+                // calculating Z and then P using softmax func
                 double[] scores = calculateScores(features);
                 double[] probabilities = softmax(scores);
 
-                // Step 2: Calculate Error
+                // step 2: calculating Error(E)
                 double[] errorSignal = new double[numClasses];
                 int trueLabel = dp.getLabel();
                 for (int j = 0; j < numClasses; j++) {
@@ -52,10 +51,12 @@ public class LogisticRegression {
                     errorSignal[j] = probabilities[j] - y_true;
                 }
 
-                // Step 3 & 4: Update Parameters
+                // step 3 & 4: updating Parameters
+                //b_new = b_old - learning_rate * grad_b -> grad_b = E
                 for (int j = 0; j < numClasses; j++) {
                     biases[j] -= learningRate * errorSignal[j];
                 }
+                //W_new = W_old - learning_rate * grad_W -> grad_W = X_transposed • E
                 for (int i = 0; i < numFeatures; i++) {
                     for (int j = 0; j < numClasses; j++) {
                         weights[i][j] -= learningRate * features[i] * errorSignal[j];
@@ -71,13 +72,13 @@ public class LogisticRegression {
      * @return The predicted class index (0, 1, or 2).
      */
     public int predict(DataPoint dataPoint) {
-        // --- Step 1: Calculate the raw scores (Z) for each class ---
-        double[] scores = calculateScores(dataPoint.getFeatures()); // <-- FIX 3: Re-use helper method
+        // calculate the raw scores (Z) for each class ---
+        double[] scores = calculateScores(dataPoint.getFeatures());
 
-        // --- Step 2: Convert scores to probabilities (P) using softmax ---
+        // convert scores to probabilities (P) using softmax ---
         double[] probabilities = softmax(scores);
 
-        // --- Step 3: Find the class with the highest probability ---
+        // -find the class with the highest probability ---
         int bestClass = -1;
         double maxProbability = -1.0;
         for (int i = 0; i < probabilities.length; i++) {
@@ -93,9 +94,7 @@ public class LogisticRegression {
     // HELPER METHODS
     // =================================================================
 
-    /**
-     * A private helper to calculate the raw scores. (Z = X • W + b)
-     */
+    // calculate the raw scores. (Z = X • W + b)
     private double[] calculateScores(double[] features) {
         double[] scores = new double[biases.length];
         for (int j = 0; j < biases.length; j++) {
@@ -107,9 +106,7 @@ public class LogisticRegression {
         return scores;
     }
 
-    /**
-     * A helper method to compute the Softmax function.
-     */
+    // to calculate the softmax function values for prabability
     private double[] softmax(double[] scores) {
         double[] probabilities = new double[scores.length];
         double maxScore = scores[0];

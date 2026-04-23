@@ -3,44 +3,35 @@ package models.decisionTree;
 public class Node {
 
     // --- Fields for a Decision Node ---
-    private final SplitCondition splitCondition; // The question to ask
-    private final Node leftChild;              // The "Yes" branch
-    private final Node rightChild;             // The "No" branch
+    private final SplitCondition splitCondition; // the question to ask
+    private final Node leftChild;              // the "Yes" branch
+    private final Node rightChild;             // the "No" branch
 
     // --- Field for a Leaf Node ---
-    private final int prediction;              // The final answer
+    private final int prediction;              // the final answer
 
-    /**
-     * Constructor for creating a Decision Node (an internal question box).
-     */
+    // constructor for a decision node
     public Node(SplitCondition splitCondition, Node leftChild, Node rightChild) {
         this.splitCondition = splitCondition;
         this.leftChild = leftChild;
         this.rightChild = rightChild;
-        this.prediction = -1; // Use a special value like -1 to show this is not a leaf
+        this.prediction = -1; // -1 to show this is not a leaf
     }
 
-    /**
-     * Constructor for creating a Leaf Node (a final answer box).
-     */
+    // constructor for a leaf node
     public Node(int prediction) {
         this.prediction = prediction;
-        this.splitCondition = null; // A leaf has no question
-        this.leftChild = null;      // A leaf has no children
+        this.splitCondition = null; // no ques
+        this.leftChild = null;      // no children
         this.rightChild = null;
     }
 
-    /**
-     * Helper method to easily check if this node is a leaf.
-     * @return true if this node is a leaf, false if it's a decision node.
-     */
+    // helper function to check a node is leaf or not
     public boolean isLeaf() {
-        // A node is a leaf if it was created with the leaf constructor,
-        // which means its children are null.
         return this.leftChild == null && this.rightChild == null;
     }
 
-    // --- Getter methods to access the node's properties ---
+    // getter methods for node fields
     public SplitCondition getSplitCondition() { return splitCondition; }
     public Node getLeftChild() { return leftChild; }
     public Node getRightChild() { return rightChild; }

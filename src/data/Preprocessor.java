@@ -7,60 +7,48 @@ import java.util.Random;
 
 public class Preprocessor {
 
-    /**
-     * Splits the full dataset into a training set and a testing set.
-     * @param data The full list of DataPoints.
-     * @param trainSplitRatio The proportion of data for the training set (e.g., 0.8 for 80%).
-     * @return A List containing two lists: the training set at index 0, and the testing set at index 1.
-     */
+    // the full list of data points , splits the data into training and testing set
+    // index 0 -> training set, index 1 -> testing set
     public static List<List<DataPoint>> splitData(List<DataPoint> data, double trainSplitRatio) {
-        // Creating a mutable copy of the data to avoid modifying the original list.
+        // a mutable copy of the data to avoid modifying the original list.
         List<DataPoint> shuffledData = new ArrayList<>(data);
 
-        // Randomly shuffle the data. This is crucial to ensure that the train and test sets
-        // are representative of the overall data and not biased by any original ordering.
+        // shuffling the full dataset
         Collections.shuffle(shuffledData);
 
-        // Calculate the index where we will split the data.
+        // calculating the index where we will split the data.
         int splitIndex = (int) (shuffledData.size() * trainSplitRatio);
 
-        // Create the training set as a sublist from the beginning to the split index.
+        // create the training set as a sublist from the beginning to the split index.
         List<DataPoint> trainingSet = new ArrayList<>(shuffledData.subList(0, splitIndex));
 
-        // Create the testing set as a sublist from the split index to the end.
+        // create the testing set as a sublist from the split index to the end.
         List<DataPoint> testingSet = new ArrayList<>(shuffledData.subList(splitIndex, shuffledData.size()));
 
-        // Return both sets in a container list.
+        // returning both sets in a container list.
         List<List<DataPoint>> result = new ArrayList<>();
         result.add(trainingSet);
         result.add(testingSet);
         return result;
     }
     //----------Oversampling-----------------------------
-    /**
-     * Balances the training data by oversampling the minority classes.
-     * It makes random copies of minority class data points until all classes
-     * have the same number of samples as the majority class.
-     *
-     * @param trainingData The imbalanced training set.
-     * @param numClasses The total number of classes (e.g., 3).
-     * @return A new, balanced list of DataPoints ready for training.
-     */
+    // balances the traning data by oversampling the minority classes
+    // finds out the majority class and for minority classes , randomly picks data 1 by 1 to have same number of data as majority class
     public static List<DataPoint> oversample(List<DataPoint> trainingData, int numClasses) {
 
-        // 1. Create "buckets" for each class
+        // creating "buckets" for each class
         List<List<DataPoint>> classBuckets = new ArrayList<>();
         for (int i = 0; i < numClasses; i++) {
             classBuckets.add(new ArrayList<>());
         }
 
-        // 2. Sort all the training data into their respective buckets
+        // sort all the training data into their respective buckets linearly
         for (DataPoint dp : trainingData) {
             int label = dp.getLabel();
             classBuckets.get(label).add(dp);
         }
 
-        // 3. Find the size of the largest bucket (the majority class)
+        // find the size of the largest bucket (the majority class) -> moderate class here
         int maxSize = 0;
         for (List<DataPoint> bucket : classBuckets) {
             if (bucket.size() > maxSize) {
@@ -68,55 +56,51 @@ public class Preprocessor {
             }
         }
 
-        // 4. Create a new list to hold our final balanced data
+        // creating a new list to hold our final balanced data
         List<DataPoint> balancedData = new ArrayList<>();
         Random rand = new Random();
 
-        // 5. Fill the balanced list
+        // fill the balanced list
         for (List<DataPoint> bucket : classBuckets) {
-            if (bucket.isEmpty()) continue; // Safety check
+            if (bucket.isEmpty()) continue;
 
-            // First, add all the original students from this bucket
+            // at first adding the original students from each bucket
             balancedData.addAll(bucket);
 
-            // Calculate how many photocopies we need to make to reach maxSize
+            // calculating how many photocopies needed to make to reach maxSize
             int numCopiesNeeded = maxSize - bucket.size();
 
-            // Randomly select students from this bucket and add copies
+            // randomly selecting students from this bucket and add copies
             for (int i = 0; i < numCopiesNeeded; i++) {
                 int randomIndex = rand.nextInt(bucket.size());
                 balancedData.add(bucket.get(randomIndex));
             }
         }
 
-        // 6. Shuffle the final deck so the model doesn't just see a block of duplicates at the end
+        // shuffling the final deck so the model doesn't just see a block of duplicates at the end
         Collections.shuffle(balancedData);
 
         return balancedData;
     }
-    /**
-     * Normalizes the features of a dataset using Min-Max scaling.
-     * It scales all feature values to be between 0.0 and 1.0.
-     *
-     * @param trainingSet The training data, used to find the min/max for each feature.
-     * @param testingSet The testing data, which will be scaled using the min/max from the training set.
-     */
+
+    // normalizes the dataset using min-max scaling
+    // finding min/max for training dataset and applying this for both dataset
     public static void normalize(List<DataPoint> trainingSet, List<DataPoint> testingSet) {
         if (trainingSet.isEmpty()) {
-            return; // Cannot normalize without training data
+            return;
         }
 
         int numFeatures = trainingSet.get(0).getFeatureCount();
         double[] minValues = new double[numFeatures];
         double[] maxValues = new double[numFeatures];
 
-        // Initialize min and max arrays with values from the first data point
+        // initialize min and max arrays with values from the first data point
         for (int i = 0; i < numFeatures; i++) {
             minValues[i] = trainingSet.get(0).getFeature(i);
             maxValues[i] = trainingSet.get(0).getFeature(i);
         }
 
-        // --- Step 1: Find the min and max for each feature from the TRAINING SET ONLY ---
+        // finding the min and max for each feature from the ------- TRAINING SET ONLY ---
         for (DataPoint dp : trainingSet) {
             for (int i = 0; i < numFeatures; i++) {
                 if (dp.getFeature(i) < minValues[i]) {
@@ -128,24 +112,24 @@ public class Preprocessor {
             }
         }
 
-        // --- Step 2: Apply the normalization to the TRAINING SET ---
+        // apply the normalization to the TRAINING SET ---
         for (DataPoint dp : trainingSet) {
             for (int i = 0; i < numFeatures; i++) {
                 double range = maxValues[i] - minValues[i];
                 if (range != 0) {
-                    // Get the original value
+                    // get the original value
                     double originalValue = dp.getFeature(i);
-                    // Calculate and set the new normalized value
+                    // calculate and set the new normalized value
                     dp.getFeatures()[i] = (originalValue - minValues[i]) / range;
                 } else {
-                    // If range is 0, all values are the same, so normalize to 0 or 0.5
+                    // If range is 0, all values are the same, so normalize to 0
                     dp.getFeatures()[i] = 0.0;
                 }
             }
         }
 
-        // --- Step 3: Apply the EXACT SAME normalization to the TESTING SET ---
-        // We use the min/max values learned from the training data to prevent data leakage.
+        // applyng the EXACT SAME normalization to the TESTING SET ---
+        // using the min/max values learned from the training data to prevent data leakage
         for (DataPoint dp : testingSet) {
             for (int i = 0; i < numFeatures; i++) {
                 double range = maxValues[i] - minValues[i];
@@ -157,10 +141,9 @@ public class Preprocessor {
             }
         }
     }
-    /**
-     * Calculates the Pearson Correlation Coefficient between a feature and the target label.
-     * Formula: r = SXY / sqrt(SSX * SSY)
-     */
+
+    // calculating Pearson Correlation Coefficient between a feature and the target label
+    // Formula: r = SXY / sqrt(SSX * SSY)
     public static double calculateCorrelation(List<DataPoint> data, int featureIndex) {
         int n = data.size();
         if (n == 0) return 0.0;
@@ -186,39 +169,53 @@ public class Preprocessor {
         return numerator / denominator;
     }
 
-    /**
-     * Creates training and testing sets for a specific fold in K-Fold Cross-Validation.
-     *
-     * @param allData The entire shuffled dataset.
-     * @param numFolds The total number of folds (K).
-     * @param foldIndex The index of the fold to be used as the test set for this iteration (0 to K-1).
-     * @return A List containing two lists: the training set at index 0, and the testing set at index 1.
-     */
+    // List containing two lists: the training set at index 0, and the testing set at index 1.
     public static List<List<DataPoint>> getKFoldSplit(List<DataPoint> allData, int numFolds, int foldIndex) {
         int totalSize = allData.size();
         int foldSize = totalSize / numFolds;
 
-        // --- Step 1: Identify the start and end indices of the test fold ---
+        // identifying the start and end indices of the test fold ---
         int testStartIndex = foldIndex * foldSize;
-        // The end index should not go past the end of the list.
+        // the end index should not go past the end of the list.
         int testEndIndex = Math.min(testStartIndex + foldSize, totalSize);
 
-        // --- Step 2: Create the testing set ---
-        // It's the sublist for the current fold.
+        // creating the testing set
+        // sublist for the current fold.
         List<DataPoint> testingSet = new ArrayList<>(allData.subList(testStartIndex, testEndIndex));
 
-        // --- Step 3: Create the training set ---
-        // It's everything EXCEPT the testing set.
+        // create the training set ---
+        // it's everything EXCEPT the testing set.
         List<DataPoint> trainingSet = new ArrayList<>();
-        // Add all data *before* the test set.
+        // adding all data *before* the test set.
         trainingSet.addAll(allData.subList(0, testStartIndex));
-        // Add all data *after* the test set.
+        // adding all data *after* the test set.
         trainingSet.addAll(allData.subList(testEndIndex, totalSize));
 
-        // --- Step 4: Return both sets in a container list ---
+        // returning both sets in a container list ---
         List<List<DataPoint>> result = new ArrayList<>();
         result.add(trainingSet);
         result.add(testingSet);
         return result;
+    }
+
+    // generates descriptive statistics (Mean and Standard Deviation) for a feature.
+    public static String getStats(List<DataPoint> data, int featureIndex) {
+        int n = data.size();
+        if (n == 0) return "0.00 ± 0.00";
+
+        double sum = 0;
+        for (DataPoint dp : data) {
+            sum += dp.getFeature(featureIndex);
+        }
+        double mean = sum / n;
+
+        double squaredDiffSum = 0;
+        for (DataPoint dp : data) {
+            double diff = dp.getFeature(featureIndex) - mean;
+            squaredDiffSum += diff * diff;
+        }
+        double sd = Math.sqrt(squaredDiffSum / n);
+
+        return String.format("%.2f ± %.2f", mean, sd);
     }
 }

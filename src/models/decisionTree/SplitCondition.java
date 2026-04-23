@@ -5,36 +5,28 @@
 //What value to compare against (3.0).
 //Outcome: The question always has a binary (yes/no) answer.
 
-
 package models.decisionTree;
 
-/**
- * Represents a question used to partition a dataset, e.g., "Is feature 2 (CGPA) <= 3.2?".
- * This is the condition that will be stored in each Decision Node.
- */
 public class SplitCondition {
-    // using the feature's index to be general, so we don't have to hardcode "age", "cgpa", etc.
+    // using the feature's index to be general, so I don't have to hardcode "age", "cgpa", etc.
     private final int featureIndex;
 
-    // The value to compare the feature against.
+    // the value to compare the feature against.
     private final double value;
 
+    // a question is defined by 2 components feature and value
     public SplitCondition(int featureIndex, double value) {
         this.featureIndex = featureIndex;
         this.value = value;
     }
 
-    /**
-     * Checks if a given student's features match this condition.
-     * @param features The features of a single student (e.g., from a DataPoint object).
-     * @return true if the condition is met, false otherwise.
-     */
+    //  to check if a given student's features match this condition
     public boolean matches(double[] features) {
-        // rule is: if the feature value is less than or equal to the split value, it's a "match" (go left).
+        // rule is: if the feature value is less than or equal to the split value, it's a "match" -> Yes (go left).
         return features[this.featureIndex] <= this.value;
     }
 
-    // Getter methods are useful for debugging and building the tree.
+    // getter methods
     public int getFeatureIndex() {
         return featureIndex;
     }

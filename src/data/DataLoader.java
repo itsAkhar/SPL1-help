@@ -4,21 +4,16 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class DataLoader {
-    /**
-     * Converts the age string from the CSV into a single numerical value.
-     * e.g., "18-22" -> 20.0
-     * @param ageString The string from the CSV, which may include quotes.
-     * @return A double representing the age.
-     */
+
+    // here I am converting the age range to a single numerical value (eg,"18-22" -> 20.0)
     private double encodeAge(String ageString) {
-        // 1. Clean the string by removing quotes.
+        // cleaning the string by removing the quotes("")
         String cleanAgeString = ageString.replace("\"", "").trim();
 
-        // 2. Handle special cases first.
+        // Handling special cases first.
         if (cleanAgeString.equalsIgnoreCase("Below 18")) {
             //I've used 17 as a representative age.
             return 17.0;
@@ -28,8 +23,8 @@ public class DataLoader {
             return 31.0;
         }
 
-        // 3. Handle the standard "lower-upper" range.
-        // Use a try-catch block for safety in case the format is unexpected.
+        // handle the standard "lower-upper" range.
+        // using try-catch to handle unexpected input
         try {
             String[] parts = cleanAgeString.split("-");
             double lowerBound = Double.parseDouble(parts[0].trim());
@@ -42,40 +37,25 @@ public class DataLoader {
         }
     }
 
-    /**
-     * Converts the gender string from the CSV into a numerical code.
-     * "Female" -> 0.0
-     * "Male" -> 1.0
-     * "Prefer not to say" (and any other value) -> 2.0
-     * @param genderString The string from the CSV, e.g., "\"Female\"".
-     * @return A double representing the encoded gender.
-     */
+    // female -> 0.0 , male -> 1.0 , prefer not to say -> 2.0
     private double encodeGender(String genderString) {
-        // First, remove the quotes and any leading/trailing whitespace.
+        // removing the quotes("") and any leading/trailing whitespace.
         String cleanGender = genderString.replace("\"", "").trim();
 
-        // Use of a case-insensitive comparison to check the value.
+        // case-insensitive comparison to check the value.
         if (cleanGender.equalsIgnoreCase("Female")) {
             return 0.0;
         } else if (cleanGender.equalsIgnoreCase("Male")) {
             return 1.0;
         } else {
-            // This will handle "Prefer not to say" or any unexpected values.
+            // "Prefer not to say" or any unexpected values.
             return 2.0;
         }
     }
 
-    /**
-     * Converts the academic year string into a numerical code.
-     * "First Year..." -> 0
-     * "Second Year..." -> 1
-     * "Third Year..." -> 2
-     * "Fourth Year..." -> 3
-     * "Other" -> 4
-     * @param yearString The string from the CSV.
-     * @return An integer code for the academic year.
-     */
+    // "First Year..." -> 0 , "Second Year..." -> 1 , "Third Year..." -> 2 , "Fourth Year..." -> 3 , "Other" -> 4
     private double encodeAcademicYear(String yearString) {
+        // trimming whitespace and quotes
         String cleanYearString = yearString.replace("\"", "").trim();
 
         if (cleanYearString.contains("First Year")) {
@@ -90,46 +70,36 @@ public class DataLoader {
             return 4.0;
         }
     }
-    /**
-     * Converts the CGPA string from the CSV into a single numerical value which is their avg.
-     * e.g., "2.50 - 2.99" -> 2.745
-     * @param cgpaString The string from the CSV.
-     * @return A double representing the CGPA.
-     */
+
+    // converting cgpa to a single avg value from their range ( eg: "2.50 - 2.99" -> 2.745 )
     private double encodeCgpa(String cgpaString) {
         String cleanCgpaString = cgpaString.replace("\"", "").trim();
 
-        // Handle the "Below" case first
+        // handling the "Below" case first
         if (cleanCgpaString.equalsIgnoreCase("Below 2.50")) {
             // I used a representative value, e.g., 2.49
             return 2.49;
         }
 
-        // Handle the "Other" case if it exists, otherwise it will be caught by the try-catch
+        // handle the "Other" case if it exists, otherwise it will be caught by the try-catch
         if (cleanCgpaString.equalsIgnoreCase("Other")) {
-            // Returning a neutral value like 3.0 might be okay.
+            // returning a neutral value 3.0.
             return 3.0;
         }
 
-        // Handle the standard "lower - upper" range
+        // handle the standard "lower - upper" range
         try {
             String[] parts = cleanCgpaString.split("-");
             double lowerBound = Double.parseDouble(parts[0].trim());
             double upperBound = Double.parseDouble(parts[1].trim());
             return (lowerBound + upperBound) / 2.0;
         } catch (Exception e) {
-            // If parsing fails for any reason
             System.err.println("Could not parse CGPA string: " + cgpaString);
-            return 0.0; // Return a default value
+            return 0.0; // returning a default value
         }
     }
-    /**
-     * Converts the waiver/scholarship status into a numerical code.
-     * "Yes" -> 1.0
-     * "No" -> 0.0
-     * @param scholarshipString The string from the CSV.
-     * @return 1.0 if "Yes", 0.0 otherwise.
-     */
+
+    // if yes -> 1.0 , if no -> 0.0
     private double encodeScholarship(String scholarshipString) {
         String cleanString = scholarshipString.replace("\"", "").trim();
         if (cleanString.equalsIgnoreCase("Yes")) {
@@ -138,39 +108,34 @@ public class DataLoader {
             return 0.0;
         }
     }
-    /**
-     * Converts the stress label string into the target integer class.
-     * "Low Stress" -> 0
-     * "Moderate Stress" -> 1
-     * "High Perceived Stress" -> 2
-     * @param labelString The string from the CSV, e.g., "\"High Perceived Stress\"".
-     * @return An integer representing the class (0, 1, or 2).
-     */
+
+    //"Low Stress" -> 0 , "Moderate Stress" -> 1 , "High Perceived Stress" -> 2
     private int encodeStressLabel(String labelString) {
-        // Firstly, removed the quotes and any leading/trailing whitespace.
         String cleanLabel = labelString.replace("\"", "").trim();
 
-        // Use a case-insensitive check.
-        // We check for "High" first as it's a more specific substring.
+        // using a case-insensitive check.
         if (cleanLabel.equalsIgnoreCase("High Perceived Stress")) {
             return 2;
         } else if (cleanLabel.equalsIgnoreCase("Moderate Stress")) {
             return 1;
-        } else { // This will catch "Low Stress"
+        } else { // for "Low Stress"
             return 0;
         }
     }
-
+    // this is the loader method which reads the CSV file
     public List<DataPoint> loadData(String filePath) {
+        // making an arraylist of dataPoint Class( data structure )
         List<DataPoint> dataPoints = new ArrayList<>();
         String line = "";
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            br.readLine(); // Skip header
+            br.readLine(); // skip header
 
             while ((line = br.readLine()) != null) {
                 try {
-                    //USING THE SMARTER SPLIT
+                    //using the smarter split
+                    // It uses a regular expression (split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1))
+                    // to correctly split CSV lines, even when some fields (like the university name) contain commas within quotes. This prevents data corruption.
                     String[] values = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
 
                     // all the features in order
@@ -182,17 +147,22 @@ public class DataLoader {
                     double anxietyValue = Double.parseDouble(values[26].replace("\"", "").trim());
                     double depressionValue = Double.parseDouble(values[37].replace("\"", "").trim());
 
+                    // the 5 main features
                     double[] features = new double[] {
                             age, gender, cgpa, anxietyValue, depressionValue
                     };
-
+                    // my target feature
                     int stressLabel = encodeStressLabel(values[18]);
 
-                    dataPoints.add(new DataPoint(features, stressLabel));
+                    // storing academic year and waiver also for distribution table
+                    int ayMeta = (int) academicYear;
+                    int waiverMeta = (int) scholarship;
+
+                    dataPoints.add(new DataPoint(features, stressLabel, ayMeta, waiverMeta));
 
                 } catch (Exception e) {
                     System.err.println("Skipping malformed line: " + line + " | Error: " + e.getMessage());
-                    // It's helpful to also print which part failed
+                    // it's helpful to also print which part failed
                     e.printStackTrace();
                 }
             }
@@ -202,33 +172,4 @@ public class DataLoader {
 
         return dataPoints;
     }
-
-//    public static void main(String[] args) {
-//        // the csv file
-//        String filePath = "MentalHealth.csv";
-//
-//        DataLoader loader = new DataLoader();
-//        List<DataPoint> data = loader.loadData(filePath);
-//
-//        System.out.println("Successfully loaded " + data.size() + " data points.");
-//
-//        if (data.size() > 0) {
-//            System.out.println("\n--- Verifying first 3 data points ---");
-//
-//            // Print the first 3 to manually check them
-//            for (int i = 0; i < 3 && i < data.size(); i++) {
-//                DataPoint dp = data.get(i);
-//                System.out.println("\nDataPoint " + (i + 1) + ":");
-//                System.out.println("  Features: " + Arrays.toString(dp.getFeatures()));
-//                System.out.println("  Label: " + dp.getLabel());
-//            }
-////            System.out.println("  Features: " + Arrays.toString(data.get(1622).getFeatures()));
-////            System.out.println("  Label: " + data.get(1622).getLabel());
-//
-//            System.out.println("\nExpected for first DataPoint (from your CSV):");
-//            System.out.println("  [20.0, 0.0, 1.0, 2.745, 0.0, 15.0, 20.0]"); // Age, Gender, Acad.Year, CGPA, Scholarship, Anxiety, Depression
-//            System.out.println("  Label: 2 (High)");
-//        }
-//    }
-
 }

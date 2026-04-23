@@ -2,10 +2,19 @@ package evaluation;
 
 public class ConfusionMatrix {
 
-    // The matrix grid: matrix[actual_label][predicted_label]
+    // the matrix grid: matrix[actual_label][predicted_label]
     private final int[][] matrix;
     private final int numClasses;
     private int totalSamples;
+
+    /*
+     predicted ->     0   |  1  |   2
+          ^      0 ->     |     |
+          |      1 ->     |     |
+        actual   2 ->     |     |
+
+     */
+
 
     public ConfusionMatrix(int numClasses) {
         this.numClasses = numClasses;
@@ -13,10 +22,7 @@ public class ConfusionMatrix {
         this.totalSamples = 0;
     }
 
-    /**
-     * Adds the result of a single prediction to the matrix.
-     * This is the main way we populate the grid.
-     */
+    // this method adds the result of a single prediction to the matrix
     public void addPrediction(int actual, int predicted) {
         if (actual >= 0 && actual < numClasses && predicted >= 0 && predicted < numClasses) {
             matrix[actual][predicted]++;
@@ -24,10 +30,7 @@ public class ConfusionMatrix {
         }
     }
 
-    /**
-     * Calculates the Overall Accuracy.
-     * Formula: (Sum of Diagonal) / (Total Samples)
-     */
+    // formula: (Sum of Diagonal) / (Total Samples)
     public double getAccuracy() {
         if (totalSamples == 0) return 0.0;
         double correct = 0;
@@ -37,15 +40,11 @@ public class ConfusionMatrix {
         return correct / totalSamples;
     }
 
-    /**
-     * Calculates the Precision for a single class.
-     * "Of all the times we PREDICTED this class, how often were we right?"
-     * Formula: TruePositives / (All Predictions for this Class)
-     */
+    //  formula :  correct prediction / all predictions for this class
     public double getPrecision(int classIndex) {
         int truePositives = matrix[classIndex][classIndex];
         int allPredictedAsClass = 0;
-        // To find all predictions for this class, we must sum DOWN the COLUMN.
+        // to find all predictions for this class, we must sum DOWN the COLUMN.
         for (int i = 0; i < numClasses; i++) {
             allPredictedAsClass += matrix[i][classIndex];
         }
@@ -53,15 +52,11 @@ public class ConfusionMatrix {
         return (double) truePositives / allPredictedAsClass;
     }
 
-    /**
-     * Calculates the Recall for a single class.
-     * "Of all the ACTUAL instances of this class, how many did we find?"
-     * Formula: TruePositives / (All Actual Instances of this Class)
-     */
+    // formula : correct prediction / actual prediction for this class
     public double getRecall(int classIndex) {
         int truePositives = matrix[classIndex][classIndex];
         int allActualOfClass = 0;
-        // To find all actual instances, we must sum ACROSS the ROW.
+        // to find all actual instances, we must sum ACROSS the ROW.
         for (int j = 0; j < numClasses; j++) {
             allActualOfClass += matrix[classIndex][j];
         }
@@ -69,10 +64,7 @@ public class ConfusionMatrix {
         return (double) truePositives / allActualOfClass;
     }
 
-    /**
-     * Calculates the F1-Score for a single class.
-     * This is the harmonic mean of Precision and Recall.
-     */
+    // harmonic mean of precision and recall
     public double getF1Score(int classIndex) {
         double precision = getPrecision(classIndex);
         double recall = getRecall(classIndex);
@@ -80,11 +72,7 @@ public class ConfusionMatrix {
         return 2 * (precision * recall) / (precision + recall);
     }
 
-    /**
-     * Prints a full, formatted report including the confusion matrix, overall accuracy,
-     * and class-wise Precision, Recall, and F1-Score.
-     * @param modelName The name of the model being evaluated (e.g., "Decision Tree").
-     */
+    //  prints the full formatted report for : 1. confusion matrix , 2. overall accuracy , 3. class-wise Precision, Recall, and F1-Score
     public void printReport(String modelName) {
         String[] labels = {"LOW", "MODERATE", "HIGH"};
 
