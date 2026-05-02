@@ -66,7 +66,7 @@ Feature selection was performed in two stages: **Pearson Correlation** for conti
 
 > Pearson Correlation quantifies linear relationship strength between features and stress (-1 to +1). Applied to continuous/numerical features only: **Age, CGPA, Anxiety Value, Depression Value.**
 
-![Pearson Correlation Output](images/pearson_correlation.png)
+![Pearson Correlation Output](Images/pearson_correlation.png)
 
 | Feature | r value | Relationship | Decision |
 |---|---|---|---|
@@ -81,7 +81,7 @@ Feature selection was performed in two stages: **Pearson Correlation** for conti
 
 ### 2. Feature Analysis: Age & CGPA
 
-![Age and CGPA Distribution Charts](images/age_cgpa_distribution.png)
+![Age and CGPA Distribution Charts](Images/age_cgpa_distribution.png)
 
 **Age:**
 - "Below 18" has ~50% Low Stress — unusually high
@@ -101,7 +101,7 @@ Applied to categorical features: **Gender, Waiver/Scholarship, Academic Year**
 
 #### Gender Distribution
 
-![Gender Distribution](images/gender_distribution.png)
+![Gender Distribution](Images/gender_distribution.png)
 
 | Group | N | Low Stress | Moderate Stress | High Perceived Stress |
 |---|---|---|---|---|
@@ -118,7 +118,7 @@ Applied to categorical features: **Gender, Waiver/Scholarship, Academic Year**
 
 #### Academic Year & Waiver Distribution
 
-![Academic Year and Waiver Distribution](images/acad_year_waiver_distribution.png)
+![Academic Year and Waiver Distribution](Images/acad_year_waiver_distribution.png)
 
 | Group | N | Low Stress | Moderate Stress | High Perceived Stress |
 |---|---|---|---|---|
@@ -151,7 +151,7 @@ Age  •  Gender  •  CGPA  •  Anxiety Value  •  Depression Value
 
 ## ⚠️ Dataset Challenge: Class Imbalance
 
-![Class Imbalance](images/class_imbalance.png)
+![Class Imbalance](Images/class_imbalance.png)
 
 | Class | Count | Percentage |
 |---|---|---|
@@ -240,9 +240,9 @@ ACT 3: Optimized
 
 ### Act 1: Imbalanced Baseline
 
-![Act 1 Low Stress Recall](images/act1_low_recall.png)
+![Act 1 Low Stress Recall](Images/act1_low_recall.png)
 
-![Act 1 High Stress Recall](images/act1_high_recall.png)
+![Act 1 High Stress Recall](Images/act1_high_recall.png)
 
 **Observation:** High accuracy but critically poor minority recall — models heavily biased toward Moderate Stress class due to imbalance.
 
@@ -261,7 +261,7 @@ ACT 3: Optimized
 - **Normalization:** Scales all features to [0,1] range — prevents large-scale features from dominating distance-based models (KNN, LR)
 - **Oversampling:** Duplicates minority class samples (Low, High stress) to match majority class (Moderate), eliminating bias toward dominant class
 
-![Act 2 Recall Comparison](images/act2_recall_comparison.png)
+![Act 2 Recall Comparison](Images/act2_recall_comparison.png)
 
 > **Observation:** Balancing + normalization dramatically boosts Low-stress recall (up to **+54 percentage points for LR**) and moderately improves High-stress recall across all models.
 
@@ -279,7 +279,7 @@ Grid search performed on the **Act 2 pipeline** (balanced + normalized) to find 
 
 ### KNN — k Parameter Tuning
 
-![KNN Tuning Chart](images/knn_tuning.png)
+![KNN Tuning Chart](Images/knn_tuning.png)
 
 **Chosen k = 21** — LOW recall plateaus and HIGH recall is maximized without accuracy collapsing.
 
@@ -297,7 +297,7 @@ Grid search performed on the **Act 2 pipeline** (balanced + normalized) to find 
 
 ### Act 3: Optimized Models — Balanced + Normalized + Tuned Parameters (maxDepth=5, k=21)
 
-![Final Results](images/final_results.png)
+![Final Results](Images/final_results.png)
 
 > Further tuning (Act 3) closes the gap for DT and KNN on both classes, making all three models competitive, while **LR peaks at Act 2 and gains nothing from tuning.**
 
