@@ -1,230 +1,281 @@
-# Mental Health Stress Prediction Using ML
+# 🧠 Mental Health Stress Prediction Using ML
 ### A From-Scratch Implementation in Java
 
 > **SPL1 Project — Institute of Information Technology (IIT), University of Dhaka**
-> **Student:** Sadman Sakib | **Roll:** 1654
-> **Supervisor:** Dr. Emon Kumar Dey
+> **Student:** Sadman Sakib | **Exam Roll:** 245406
+> **Supervisor:** Dr. Emon Kumar Dey | **Presentation:** SPL1 Final, 2025
 
 ---
 
-## Table of Contents
+## 📌 Table of Contents
 
-- [Project Overview](#project-overview)
-- [Dataset](#dataset)
-- [Feature Analysis](#feature-analysis)
-- [Project Structure](#project-structure)
-- [Pipeline — 4 Acts](#pipeline--4-acts)
-- [Model Implementation](#model-implementation)
-- [Hyperparameter Tuning](#hyperparameter-tuning)
-- [Results](#results)
-- [How to Run](#how-to-run)
-- [Technologies Used](#technologies-used)
+- [Project Overview](#-project-overview)
+- [Dataset](#-dataset)
+- [Feature Selection](#-feature-selection)
+- [Dataset Challenge: Class Imbalance](#-dataset-challenge-class-imbalance)
+- [Project Structure](#-project-structure)
+- [Model Implementation](#-model-implementation)
+- [Evaluation Methodology](#-evaluation-methodology)
+- [Preprocessing: Normalization & Balancing](#-preprocessing-normalization--balancing)
+- [Hyperparameter Tuning](#-hyperparameter-tuning)
+- [Final Results](#-final-results)
+- [How to Run](#-how-to-run)
+- [Technologies Used](#-technologies-used)
 
 ---
 
-## Project Overview
+## 📋 Project Overview
 
-This project develops a machine learning system that predicts the **stress levels of university students** based on demographic, academic, and psychological data. Students are classified into three categories:
+**Project Goal:**
+Develop a machine learning system to predict student stress levels **(Low, Moderate, High)** using demographic and psychological data.
 
-| Label | PSS Score Range |
+| Highlight | Detail |
 |---|---|
-| 🟢 Low Stress | 0 – 13 |
-| 🟡 Moderate Stress | 14 – 26 |
-| 🔴 High Perceived Stress | 27 – 40 |
-
-All ML algorithms are **implemented entirely from scratch in Java** — no external ML libraries are used. The goal is to demonstrate deep algorithmic understanding while solving a real-world mental health detection problem.
+| **Dataset** | A survey-based dataset (MHP Dataset) of 2,028 Bangladeshi university students across 15 institutions |
+| **Approach** | From-scratch implementation in Java (no ML libraries) |
+| **Models** | Decision Tree, Logistic Regression, K-Nearest Neighbors |
+| **Methodology** | 10-Fold Cross-Validation with iterative optimization |
+| **Best Performance** | 72.8% recall for Low stress, 78.9% for High stress (Act 3) |
 
 ---
 
-## Dataset
+## 📊 Dataset
 
-**Source:** [MHP (Anxiety, Stress, Depression) Dataset of University Students — figshare](https://figshare.com)
+**Source:** [MHP (Anxiety, Stress, Depression) Dataset — figshare](https://figshare.com)
 
-| Property | Value |
+The dataset contains responses from **2,028 Bangladeshi university students** across **15 institutions**.
+
+### Feature Categories
+
+| Category | Features |
 |---|---|
-| Total Records | 2,028 |
-| Population | Bangladeshi university students |
-| Format | CSV |
-
-### Original Features (10 total)
-
-| Feature | Type | Description |
-|---|---|---|
-| Age | Numerical (continuous) | Age range encoded as midpoint |
-| Gender | Categorical (nominal) | Female / Male / Prefer not to say |
-| University | Categorical (nominal) | 15 Bangladeshi universities |
-| Department | Categorical (nominal) | 12 department categories |
-| Academic Year | Categorical (ordinal) | First / Second / Third / Fourth / Other |
-| Current CGPA | Numerical (continuous) | CGPA range encoded as midpoint |
-| Waiver/Scholarship | Categorical (binary) | Yes / No |
-| **Stress Label** | **Target** | **Low / Moderate / High (PSS score)** |
-| Anxiety Value | Numerical (continuous) | GAD-7 score (0–21) |
-| Depression Value | Numerical (continuous) | PHQ-9 score (0–27) |
+| **Demographic** | Age, Gender, Academic Year |
+| **Academic** | Current CGPA, Waiver/Scholarship, University, Department |
+| **Psychological** | Anxiety Value (GAD-7, 0–21), Depression Value (PHQ-9, 0–27) |
+| **Target** | **Stress Label** — Low (0–13), Moderate (14–26), High (27–40) |
 
 ---
 
-## Feature Analysis
+## 🔍 Feature Selection
 
-### Pearson Correlation
-Applied to all **continuous/numerical features** to measure linear association with the stress label.
+Feature selection was performed in two stages: **Pearson Correlation** for continuous features and **Group Distribution Analysis** for categorical features.
+
+---
+
+### 1. Pearson Correlation Analysis
+
+> Pearson Correlation quantifies linear relationship strength between features and stress (-1 to +1). Applied to continuous/numerical features only: **Age, CGPA, Anxiety Value, Depression Value.**
 
 ![Pearson Correlation Output](images/pearson_correlation.png)
 
-| Feature | r value | Relationship |
-|---|---|---|
-| Age | -0.05 | NEGLIGIBLE |
-| CGPA | -0.06 | NEGLIGIBLE |
-| Anxiety Score | 0.56 | MODERATE |
-| Depression Score | 0.50 | MODERATE |
+| Feature | r value | Relationship | Decision |
+|---|---|---|---|
+| Age | -0.05 | NEGLIGIBLE | ✅ Keep (non-linear pattern found) |
+| CGPA | -0.06 | NEGLIGIBLE | ✅ Keep (domain relevance) |
+| Anxiety Score | **0.56** | MODERATE | ✅ Keep — clear linear trend |
+| Depression Score | **0.50** | MODERATE | ✅ Keep — clear linear trend |
 
-> Pearson correlation is applicable only to numerical/continuous variables. Gender, Academic Year, and Waiver are categorical — analyzed separately using group distribution tables.
-
----
-
-### Group Distribution Analysis
-
-**Gender Distribution**
-
-![Gender Distribution Table](images/gender_distribution.png)
-
-Gender is retained for **demographic context** despite weak correlation, as stress patterns differ noticeably across gender groups.
+**Anxiety Score and Depression Score** show clear linear trends with the stress label — strongest predictors in the dataset.
 
 ---
 
-**Academic Year Distribution**
+### 2. Feature Analysis: Age & CGPA
 
-![Academic Year Distribution Table](images/academic_year_distribution.png)
+![Age and CGPA Distribution Charts](images/age_cgpa_distribution.png)
 
----
+**Age:**
+- "Below 18" has ~50% Low Stress — unusually high
+- "18–22" Low Stress almost disappears
+- "Above 30" Low Stress shoots back up again
+- ✅ **Keep Age** — U-shaped / non-linear pattern
 
-**Waiver / Scholarship Distribution**
-
-![Waiver Distribution Table](images/waiver_distribution.png)
-
-Academic Year and Waiver are **excluded** due to negligible correlation and near-uniform stress distribution across groups — they add noise without predictive value.
-
----
-
-### Stress Distribution by University & Department
-
-![University Distribution Chart](images/university_distribution.png)
-
-![Department Distribution Chart](images/department_distribution.png)
-
-University and Department are excluded to **avoid institutional bias** and maintain model generalizability.
+**CGPA:**
+- Across ALL CGPA ranges, the distribution looks nearly identical — dominated by Moderate Stress with similar High/Low ratios
+- ✅ **Keep CGPA** — Domain Relevance
 
 ---
 
-### Final Selected Features (5)
+### 3. Group Distribution Analysis
 
-| Feature | Reason for Inclusion |
-|---|---|
-| Age | Continuous — included after correlation analysis |
-| Gender | Nominal — included for demographic context |
-| CGPA | Continuous — included after correlation analysis |
-| Anxiety Value | Strong predictor (r = 0.56) |
-| Depression Value | Strong predictor (r = 0.50) |
+Applied to categorical features: **Gender, Waiver/Scholarship, Academic Year**
+
+#### Gender Distribution
+
+![Gender Distribution](images/gender_distribution.png)
+
+| Group | N | Low Stress | Moderate Stress | High Perceived Stress |
+|---|---|---|---|---|
+| Female | 613 | 15 (2.4%) | 377 (61.5%) | 221 (36.1%) |
+| Male | 1405 | 100 (7.1%) | 965 (68.7%) | 340 (24.2%) |
+| Prefer not to say | 10 | 0 (0.0%) | 6 (60.0%) | 4 (40.0%) |
+
+- Females: **36.1% High Stress** — noticeably higher
+- Males: **24.2% High Stress** — lower
+- The gap is **~12 percentage points**, which is meaningful
+- ✅ **Keep Gender** — meaningful distributional differences across groups
 
 ---
 
-### Class Imbalance
+#### Academic Year & Waiver Distribution
 
-The dataset is significantly imbalanced, causing models to bias results toward the majority class (Moderate Stress).
+![Academic Year and Waiver Distribution](images/acad_year_waiver_distribution.png)
+
+| Group | N | Low Stress | Moderate Stress | High Perceived Stress |
+|---|---|---|---|---|
+| First Year | 601 | 43 (7.2%) | 418 (69.6%) | 140 (23.3%) |
+| Second Year | 382 | 20 (5.2%) | 225 (58.9%) | 137 (35.9%) |
+| Third Year | 570 | 19 (3.3%) | 383 (67.2%) | 168 (29.5%) |
+| Fourth Year | 403 | 27 (6.7%) | 270 (67.0%) | 106 (26.3%) |
+| Other | 72 | 6 (8.3%) | 52 (72.2%) | 14 (19.4%) |
+
+❌ **Excluded Academic Year** — Non-linear spike in 2nd year, but weak discriminative power overall.
+
+| Group | N | Low Stress | Moderate Stress | High Perceived Stress |
+|---|---|---|---|---|
+| No Waiver | 1602 | 91 (5.7%) | 1060 (66.2%) | 451 (28.2%) |
+| Has Waiver | 426 | 24 (5.6%) | 288 (67.6%) | 114 (26.8%) |
+
+❌ **Excluded Waiver** — Almost no discriminative power between groups.
+
+> University and Department excluded to avoid **institutional bias** and maintain generalizability.
+
+---
+
+### ✅ Final Selected Features (5)
+
+```
+Age  •  Gender  •  CGPA  •  Anxiety Value  •  Depression Value
+```
+
+---
+
+## ⚠️ Dataset Challenge: Class Imbalance
+
+![Class Imbalance](images/class_imbalance.png)
 
 | Class | Count | Percentage |
 |---|---|---|
 | Moderate Stress | 1,348 | 66.5% |
 | High Perceived Stress | 565 | 27.9% |
-| Low Stress | 115 | 5.7% |
+| **Low Stress** | **115** | **5.7%** |
 
-This imbalance is addressed in **Act 3** using oversampling.
+**Impact on Model Performance:**
+- Models biased toward Moderate class
+- Poor recall for Low and High stress
+- Misses critical at-risk students
+
+This imbalance is directly addressed in **Act 2** using oversampling.
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 SPL1-Mental-Health-Stress-Prediction/
 │
 ├── src/
-│   ├── Main.java                          # Entry point — interactive menu
+│   ├── Main.java                            # Entry point — 3-option interactive menu
 │   │
 │   ├── data/
-│   │   ├── DataLoader.java                # CSV parsing & feature encoding
-│   │   ├── DataPoint.java                 # Data model (features + label + metadata)
-│   │   └── Preprocessor.java             # Normalization, oversampling, K-Fold split
+│   │   ├── DataLoader.java                  # CSV parsing & feature encoding
+│   │   ├── DataPoint.java                   # Data model (features + label + metadata)
+│   │   └── Preprocessor.java               # Normalization, oversampling, K-Fold split
 │   │
 │   ├── models/
 │   │   ├── logisticRegression/
-│   │   │   └── LogisticRegression.java    # Softmax + SGD from scratch
+│   │   │   └── LogisticRegression.java      # Softmax + SGD from scratch
 │   │   ├── knn/
-│   │   │   └── KNN.java                   # K-Nearest Neighbors from scratch
+│   │   │   └── KNN.java                     # K-Nearest Neighbors from scratch
 │   │   └── decisionTree/
-│   │       ├── DecisionTree.java          # Gini impurity + recursive split
-│   │       ├── Node.java                  # Tree node structure
-│   │       ├── BestSplitResult.java       # Stores best split candidate
-│   │       └── SplitCondition.java        # Split condition definition
+│   │       ├── DecisionTree.java            # Gini impurity + recursive split
+│   │       ├── Node.java                    # Tree node structure
+│   │       ├── BestSplitResult.java         # Stores best split candidate
+│   │       └── SplitCondition.java          # Split condition definition
 │   │
 │   └── evaluation/
-│       └── ConfusionMatrix.java           # Accuracy, Precision, Recall, F1
+│       └── ConfusionMatrix.java             # Accuracy, Precision, Recall, F1
 │
-├── MentalHealth.csv                       # Dataset (place in root directory)
-├── images/                                # Charts and screenshots for README
+├── MentalHealth.csv                         # Dataset (place in root directory)
+├── images/                                  # All charts and screenshots
 └── README.md
 ```
 
 ---
 
-## Pipeline — 4 Acts
+## 🤖 Model Implementation
 
-The evaluation pipeline is structured into 4 progressive acts, each building on the previous to address identified weaknesses.
+All three models are implemented **entirely from scratch in Java** — no external ML libraries used.
+
+| Model | Key Details | Why Chosen |
+|---|---|---|
+| **Decision Tree** | Gini Impurity, Initial: maxDepth=10, Optimized: maxDepth=5 | Handles non-linear patterns (e.g. Age) without normalization |
+| **Logistic Regression** | Softmax + SGD, Epochs=500, LR=0.01 | Widely used in health classification; reveals critical impact of normalization |
+| **KNN** | Euclidean distance, Initial: k=5, Optimized: k=21 | Mental health screening is naturally a peer-comparison problem |
+
+---
+
+## 📐 Evaluation Methodology
+
+### 10-Fold Cross-Validation
+
+Data is split into 10 folds; each fold serves as the test set once while the remaining 9 folds train the model. This ensures **every data point is used for both training and testing**.
+
+### Iterative Pipeline (3 Acts)
 
 ```
 Raw Data
    │
    ▼
 ACT 1: Imbalanced (Baseline)
-   │  → Reveals bias toward Moderate class
+   │  → High accuracy but poor minority class recall
    ▼
-ACT 2: Normalized (Min-Max)
-   │  → Improves distance-based models (KNN, LR)
-   ▼
-ACT 3: Balanced + Normalized (Oversampling)
+ACT 2: Balanced + Normalized
+   │  → Min-Max normalization + Oversampling
    │  → Dramatically improves Low & High stress recall
    ▼
-ACT 4: Optimized (Tuned Hyperparameters)
-   └  → Best overall performance (maxDepth=5, k=21)
+ACT 3: Optimized
+   └  → Tuned hyperparameters (maxDepth=5, k=21)
+      → Best overall minority class performance
 ```
 
-All acts use **10-Fold Cross-Validation** to ensure every data point is used for both training and testing.
+### Act 1: Imbalanced Baseline
+
+![Act 1 Low Stress Recall](images/act1_low_recall.png)
+
+![Act 1 High Stress Recall](images/act1_high_recall.png)
+
+**Observation:** High accuracy but critically poor minority recall — models heavily biased toward Moderate Stress class due to imbalance.
+
+| Model | Low Stress Recall | High Stress Recall |
+|---|---|---|
+| Decision Tree | 13.8% | 56.0% |
+| Logistic Regression | 18.2% | 54.3% |
+| KNN | 5.7% | 55.8% |
 
 ---
 
-## Model Implementation
+## ⚙️ Preprocessing: Normalization & Balancing
 
-All three models are implemented **from scratch in Java** with no external ML libraries.
+### Act 2: Min-Max Normalization + Oversampling
 
-### 1. Decision Tree
-- **Algorithm:** Recursive binary splitting using Gini Impurity
-- **Initial depth:** 10 | **Optimized depth:** 5
-- **Min samples per split:** 2
-- **Why chosen:** Interpretable decision paths, handles non-linear relationships, no normalization required
+- **Normalization:** Scales all features to [0,1] range — prevents large-scale features from dominating distance-based models (KNN, LR)
+- **Oversampling:** Duplicates minority class samples (Low, High stress) to match majority class (Moderate), eliminating bias toward dominant class
 
-### 2. Logistic Regression
-- **Algorithm:** Softmax regression with Stochastic Gradient Descent (SGD)
-- **Learning rate:** 0.01 | **Epochs:** 500
-- **Why chosen:** Proven baseline linear classifier, probabilistic output, fast training for repeated CV
+![Act 2 Recall Comparison](images/act2_recall_comparison.png)
 
-### 3. K-Nearest Neighbors (KNN)
-- **Algorithm:** Euclidean distance + majority vote
-- **Initial k:** 5 | **Optimized k:** 21
-- **Why chosen:** Non-parametric, instance-based learning, sensitive to normalization (good for demonstrating preprocessing impact)
+> **Observation:** Balancing + normalization dramatically boosts Low-stress recall (up to **+54 percentage points for LR**) and moderately improves High-stress recall across all models.
+
+| Model | Low Recall (Act 1 → Act 2) | High Recall (Act 1 → Act 2) |
+|---|---|---|
+| Decision Tree | 13.8% → 44.0% | 56.0% → 68.3% |
+| Logistic Regression | 18.2% → **72.8%** | 54.3% → **78.9%** |
+| KNN | 5.7% → 37.9% | 55.8% → 71.3% |
 
 ---
 
-## Hyperparameter Tuning
+## 🎯 Hyperparameter Tuning
 
-Tuning was performed on the **Act 3 pipeline** (balanced + normalized) to find optimal parameters that maximize minority class recall.
+Grid search performed on the **Act 2 pipeline** (balanced + normalized) to find optimal parameters that maximize minority class recall.
 
 ### KNN — k Parameter Tuning
 
@@ -232,97 +283,53 @@ Tuning was performed on the **Act 3 pipeline** (balanced + normalized) to find o
 
 **Chosen k = 21** — LOW recall plateaus and HIGH recall is maximized without accuracy collapsing.
 
----
-
 ### Decision Tree — maxDepth Tuning
 
 ![Decision Tree Tuning Chart](images/dt_tuning.png)
 
-**Chosen maxDepth = 5** — LOW recall (~59%) stays good while HIGH recall (~75%) remains strong before both degrade at deeper depths.
+**Chosen maxDepth = 5** — LOW recall stays balanced while HIGH recall remains strong before both degrade at deeper depths.
+
+> **Logistic Regression:** No hyperparameters tuned — learning rate and epochs fixed at 0.01 and 500.
 
 ---
 
-## Results
+## 🏆 Final Results
 
-All results are averaged over **50 repeats × 10-Fold Cross-Validation**.
+### Act 3: Optimized Models — Balanced + Normalized + Tuned Parameters (maxDepth=5, k=21)
 
-### Overall Accuracy — Act 1 → Act 4
+![Final Results](images/final_results.png)
 
-![Overall Accuracy Chart](images/overall_accuracy.png)
+> Further tuning (Act 3) closes the gap for DT and KNN on both classes, making all three models competitive, while **LR peaks at Act 2 and gains nothing from tuning.**
 
-| Act | Decision Tree | Logistic Regression | KNN |
+### Low Stress Recall — Critical Metric for Early Detection
+
+| Model | Act 1 | Act 2 | Act 3 |
 |---|---|---|---|
-| Act 1 (Imbalanced) | 69.8% | 62.7% | 72.4% |
-| Act 2 (Normalized) | 69.8% | 74.3% | 72.0% |
-| Act 3 (Balanced+Norm) | 60.2% | 55.6% | 59.1% |
-| Act 4 (Optimized) | 61.0% | 55.6% | 53.6% |
+| Decision Tree | 13.8% | 44.0% | **60.4%** |
+| Logistic Regression | 18.2% | **72.8%** | 72.8% |
+| KNN | 5.7% | 37.9% | **62.1%** |
 
----
+### High Stress Recall — Essential for Risk Identification
 
-### Act 1: Imbalanced Data (Baseline)
-
-![Act 1 Chart](images/act1_chart.png)
-
-> High accuracy but poor Low and High stress recall — model is biased toward Moderate class due to imbalance.
-
----
-
-### Act 2: Normalized Data
-
-![Act 2 Chart](images/act2_chart.png)
-
-> Min-max normalization applied. LR accuracy jumps to 74.30% but Low-stress recall collapses to 2.38% for LR.
-
----
-
-### Act 3: Balanced + Normalized
-
-![Act 3 Chart](images/act3_chart.png)
-
-> Oversampling applied. Overall accuracy drops slightly but Low and High stress recall improves dramatically across all models.
-
----
-
-### Recall — Low Stress Class (Act 1 → 4)
-
-![Low Stress Recall Chart](images/low_recall.png)
-
-| Act | Decision Tree | Logistic Regression | KNN |
+| Model | Act 1 | Act 2 | Act 3 |
 |---|---|---|---|
-| Act 1 | 13.8% | 18.2% | 5.7% |
-| Act 2 | 13.7% | 2.4% | 6.3% |
-| Act 3 | 44.0% | 72.8% | 37.9% |
-| Act 4 | 60.4% | 72.8% | 62.1% |
+| Decision Tree | 56.0% | 68.3% | **75.4%** |
+| Logistic Regression | 54.3% | **78.9%** | 78.9% |
+| KNN | 55.8% | 71.3% | **76.8%** |
 
----
-
-### Recall — High Stress Class (Act 1 → 4)
-
-![High Stress Recall Chart](images/high_recall.png)
-
-| Act | Decision Tree | Logistic Regression | KNN |
-|---|---|---|---|
-| Act 1 | 56.0% | 54.3% | 55.8% |
-| Act 2 | 56.0% | 56.9% | 54.9% |
-| Act 3 | 68.3% | 78.9% | 71.3% |
-| Act 4 | 75.4% | 78.9% | 76.8% |
-
----
-
-### Best Model: Logistic Regression (Act 4)
+### 🥇 Best Model: Logistic Regression
 
 | Metric | Value |
 |---|---|
-| Overall Accuracy | 55.6% |
 | Low Stress Recall | **72.8%** |
 | High Stress Recall | **78.9%** |
-| Pipeline | Balanced + Normalized + Tuned |
+| Pipeline | Balanced + Normalized |
 
-> In a mental health prediction context, **recall for minority classes (Low and High stress) is more critical than overall accuracy**. Missing a high-stress student is a far worse outcome than a false alarm.
+> In a mental health prediction context, **recall for minority classes (Low and High stress) is the critical metric** — missing a high-stress student is a far worse outcome than a false alarm.
 
 ---
 
-## How to Run
+## ▶️ How to Run
 
 ### Prerequisites
 - Java JDK 8 or higher
@@ -340,12 +347,12 @@ cd SPL1-Mental-Health-Stress-Prediction
 **2. Open in IntelliJ IDEA**
 ```
 File → Open → Select project folder
-Mark src/ as Sources Root
+Right-click src/ → Mark Directory as → Sources Root
 ```
 
 **3. Place the dataset**
 ```
-MentalHealth.csv  ← place in root directory (same level as src/)
+MentalHealth.csv  ←  place in root directory (same level as src/)
 ```
 
 **4. Run Main.java**
@@ -372,32 +379,65 @@ Your choice:
 
 | Option | Description |
 |---|---|
-| `1` | Feature Analysis — Pearson correlation + group distribution tables |
-| `2` | Model Evaluation — Runs full 10-Fold CV across all 4 Acts |
-| `3` | Predict — Enter a new student's data and get stress prediction from 3 models with majority vote |
+| `1` | **Feature Analysis** — Pearson correlation for continuous features + group distribution tables for categorical features |
+| `2` | **Model Evaluation** — Runs full 10-Fold CV across all 3 Acts and prints confusion matrix, accuracy, precision, recall, F1 |
+| `3` | **Predict** — Enter a new student's data and get individual predictions from all 3 models + majority vote result |
 | `0` | Exit |
 
+### Option 3 — Sample Prediction Output
+```
+==========================================================
+                  PREDICTION RESULTS
+==========================================================
+  Decision Tree predicts            : Moderate Stress
+  Logistic Regression predicts      : High Perceived Stress
+  KNN (k=21) predicts               : High Perceived Stress
+----------------------------------------------------------
+  >>> FINAL PREDICTION (Majority Vote) : High Perceived Stress  (2/3 votes)
+==========================================================
+```
+
 ### Changing Number of Repeats
-In `Main.java`, change the constant:
+In `Main.java`, change the constant manually:
 ```java
-private static final int NUM_REPEATS = 1;   // Change to 50 for full analysis
+private static final int NUM_REPEATS = 1;   // Change to 50 for full statistical analysis
 ```
 
 ---
 
-## Technologies Used
+## 🛠️ Technologies Used
 
 | Tool | Purpose |
 |---|---|
-| Java | Primary programming language |
-| IntelliJ IDEA | Development environment |
-| Git & GitHub | Version control |
-| CSV | Dataset format |
-| Manual Math | All ML algorithms implemented from scratch |
+| **Java** | Primary programming language |
+| **IntelliJ IDEA** | Development environment |
+| **Git & GitHub** | Version control and project tracking |
+| **CSV** | Dataset input format |
+| **Manual Math** | All ML algorithms implemented from scratch (no libraries) |
 
 ---
 
-## Acknowledgements
+## 📂 Images Folder Reference
+
+Create an `images/` folder in your repository root and add the following files:
+
+| Filename | What to put there |
+|---|---|
+| `pearson_correlation.png` | Pearson correlation terminal output screenshot |
+| `age_cgpa_distribution.png` | Stress distribution by Age & CGPA bar charts (slide 5) |
+| `gender_distribution.png` | Gender group distribution table + bar chart (slide 6) |
+| `acad_year_waiver_distribution.png` | Academic Year + Waiver distribution tables (slide 7) |
+| `class_imbalance.png` | Class imbalance table + IntelliJ screenshot (slide 10) |
+| `act1_low_recall.png` | Act 1 Low Stress recall bar chart (slide 9) |
+| `act1_high_recall.png` | Act 1 High Stress recall bar chart (slide 9) |
+| `act2_recall_comparison.png` | Act 1 vs Act 2 Low & High recall side-by-side (slide 11) |
+| `knn_tuning.png` | KNN k-value tuning line chart (slide 12) |
+| `dt_tuning.png` | Decision Tree maxDepth tuning line chart (slide 12) |
+| `final_results.png` | Act 1→3 Low & High recall final comparison charts (slide 13) |
+
+---
+
+## 🙏 Acknowledgements
 
 - **Dataset:** MHP (Anxiety, Stress, Depression) Dataset — figshare
 - **Supervisor:** Dr. Emon Kumar Dey, IIT, University of Dhaka
@@ -405,4 +445,4 @@ private static final int NUM_REPEATS = 1;   // Change to 50 for full analysis
 
 ---
 
-*SPL1 Project — 2025*
+*SPL1 Final Project — 2025*
