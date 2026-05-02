@@ -1,4 +1,4 @@
-# 🧠 Mental Health Stress Prediction Using ML
+# Mental Health Stress Prediction Using ML
 ### A From-Scratch Implementation in Java
 
 > **SPL1 Project — Institute of Information Technology (IIT), University of Dhaka**
@@ -7,7 +7,7 @@
 
 ---
 
-## 📌 Table of Contents
+## Table of Contents
 
 - [Project Overview](#project-overview)
 - [Dataset](#dataset)
@@ -115,7 +115,7 @@ University and Department are excluded to **avoid institutional bias** and maint
 
 ---
 
-### ✅ Final Selected Features (5)
+### Final Selected Features (5)
 
 | Feature | Reason for Inclusion |
 |---|---|
@@ -309,7 +309,7 @@ All results are averaged over **50 repeats × 10-Fold Cross-Validation**.
 
 ---
 
-### 🏆 Best Model: Logistic Regression (Act 4)
+### Best Model: Logistic Regression (Act 4)
 
 | Metric | Value |
 |---|---|
