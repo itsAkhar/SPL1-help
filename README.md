@@ -171,7 +171,7 @@ This imbalance is directly addressed in **Act 2** using oversampling.
 ## Project Structure
 
 ```
-SPL1-Mental-Health-Stress-Prediction/
+Mental-Health-Stress-Prediction-Using-ML/
 │
 ├── src/
 │   ├── Main.java                            # Entry point — 3-option interactive menu
