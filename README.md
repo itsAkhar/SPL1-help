@@ -9,7 +9,7 @@
 
 ## Table of Contents
 
-- [Project Overview](#-project-overview)
+- [Project Overview](#Project-Overview)
 - [Dataset](#-dataset)
 - [Feature Selection](#-feature-selection)
 - [Dataset Challenge: Class Imbalance](#-dataset-challenge-class-imbalance)
