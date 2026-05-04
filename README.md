@@ -41,7 +41,7 @@ Develop a machine learning system to predict student stress levels **(Low, Moder
 
 ## Dataset
 
-**Source:** [MHP (Anxiety, Stress, Depression) Dataset — figshare](https://figshare.com)
+**Source:** [MHP (Anxiety, Stress, Depression) Dataset — figshare](https://figshare.com/articles/dataset/MHP_Anxiety_Stress_Depression_Dataset_of_University_Students/25771164)
 
 The dataset contains responses from **2,028 Bangladeshi university students** across **15 institutions**.
 
