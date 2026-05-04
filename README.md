@@ -12,7 +12,8 @@
 - [Project Overview](#Project-Overview)
 - [Dataset](#Dataset)
 - [Feature Selection](#Feature-Selection)
-- [Dataset Challenge: Class Imbalance](#Dataset-Challenge:-Class-Imbalance)
+- [Dataset Challenge: Class Imbalance](#-Dataset-Challenge:-Class-Imbalance
+)
 - [Project Structure](#Project-Structure)
 - [Model Implementation](#Model-Implementation)
 - [Evaluation Methodology](#Evaluation-Methodology)
