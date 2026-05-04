@@ -16,11 +16,11 @@
 - [Project Structure](#Project-Structure)
 - [Model Implementation](#Model-Implementation)
 - [Evaluation Methodology](#Evaluation-Methodology)
-- [Preprocessing: Normalization & Balancing](#Preprocessing-Normalization-Balancing)
-- [Hyperparameter Tuning](#-hyperparameter-tuning)
-- [Final Results](#-final-results)
-- [How to Run](#-how-to-run)
-- [Technologies Used](#-technologies-used)
+- [Preprocessing: Normalization & Balancing](#Preprocessing:-Normalization-&-Balancing)
+- [Hyperparameter Tuning](#Hyperparameter-Tuning)
+- [Final Results](#Final-Results)
+- [How to Run](#How-to-Run)
+- [Technologies Used](#Technologies-Used)
 
 ---
 
